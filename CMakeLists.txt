@@ -51,6 +51,7 @@ set(COMMON_LIBS
     libaravis-0.8.so
     glib-2.0 gio-2.0 gobject-2.0 gthread-2.0
     ParallelTime
+    serial
 )
 
 set(LIB_SOURCES

@@ -16,8 +16,8 @@ void DisplayManager::display_img_scaled(std::string const & window_name, cv::Mat
 }
 
 DisplayManager::DisplayManager() {
-    std::thread t(&DisplayManager::image_display_thread, &*this);
-    t.detach();
+    std::thread (&DisplayManager::image_display_thread, this).detach();
+    std::thread (&DisplayManager::serial_thread, this).detach();
 }
 
 void DisplayManager::image_display_thread() {
@@ -36,6 +36,70 @@ void DisplayManager::show_image() {
     image_show_index++;
     display_img_scaled("image", images.at(image_show_index % images.size()));
     cv::waitKey(1);
+}
+
+bool DisplayManager::connect_serial(std::string const& path) {
+    try {
+        port.Open(path);
+        port.SetBaudRate(connection_baudrate);
+    }
+    catch(...) {
+        port.Close();
+        return false;
+    }
+    return port.IsOpen();
+}
+
+bool DisplayManager::auto_connect_serial() {
+    for (std::string const& path : {
+         "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyACM0", "/dev/ttyACM1"
+}) {
+        if (connect_serial(path)) {
+            Misc::println("Serial connected at {}", path);
+            return true;
+        }
+    }
+    return false;
+}
+
+void DisplayManager::serial_thread() {
+    while (true) {
+        serial_thread_sub();
+        Misc::msleep(.1);
+    }
+}
+
+void DisplayManager::serial_thread_sub() {
+    if (!port.IsOpen()) {
+        if (!auto_connect_serial()) {
+            return;
+        }
+    }
+    try {
+        while (port.IsDataAvailable()) {
+            char c = 0;
+            port.ReadByte(c, 1);
+            if (c == 0) {
+                break;
+            }
+            if ('\n' == c || '\r' == c) {
+                if (!serial_line.empty()) {
+                    handle_serial_line(serial_line);
+                }
+                serial_line.clear();
+            }
+            else {
+                serial_line += c;
+            }
+        }
+    }
+    catch (std::exception const& e) {
+        Misc::println("Got exception while reading serial data: \n{}\n", e.what());
+    }
+}
+
+void DisplayManager::handle_serial_line(const std::string &line) {
+    Misc::println("Got line from uC: \n{}\n", line);
 }
 
 void DisplayManager::setImageFiles(const QString &str) {

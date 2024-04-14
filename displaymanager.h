@@ -10,6 +10,12 @@
 #include <QLabel>
 #include <QMouseEvent>
 
+#include <libserial/SerialPort.h>
+#include <libserial/SerialPortConstants.h>
+#include <libserial/SerialStream.h>
+
+namespace LS = LibSerial;
+
 class DisplayManager : public QObject{
     Q_OBJECT
 
@@ -37,6 +43,20 @@ class DisplayManager : public QObject{
     void image_display_thread();
 
     void show_image();
+
+    LS::SerialPort port;
+    LS::BaudRate connection_baudrate = LS::BaudRate::BAUD_115200;
+
+    bool connect_serial(std::string const& path);
+
+    bool auto_connect_serial();
+
+    void serial_thread();
+
+    std::string serial_line;
+    void serial_thread_sub();
+
+    void handle_serial_line(std::string const& line);
 
 public:
     DisplayManager(DisplayManager const&)               = delete;
