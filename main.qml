@@ -5,7 +5,7 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
 
-import QtQuick.Dialogs 1.0
+import QtQuick.Dialogs 1.3
 
 Window {
     width: 640
@@ -72,24 +72,28 @@ Window {
                 RowLayout {
                     ColumnLayout {
                         Button {
-                            text: "Open image(s)"
+                            text: "Add images to the animation"
                             onClicked: imageDialog.visible = true
+                        }
+                        Button {
+                            text: "Clear animation"
+                            onClicked: set.image_files = ""
                         }
                         FileDialog {
                             id: imageDialog
-                            title: "Please choose one or more images"
+                            title: "Please choose an image"
                             folder: shortcuts.home
                             onAccepted: {
                                 console.log("You chose: " + fileUrls)
-                                set.image_files = urlListToString(fileUrls)
-                                displayManager.setMaskFile(set.image_files)
-                                mask_display.text = set.image_files
+                                set.image_files += urlListToString(fileUrls)
+                                displayManager.setImageFiles(set.image_files)
+                                image_display.text = set.image_files
                             }
                             onRejected: {
-                                console.log("Canceled opening image(s)")
+                                console.log("Canceled adding an image to the animation")
                             }
                             Component.onCompleted: {
-                                displayManager.setImageFile(fileUrls)
+                                displayManager.setImageFiles(set.image_files)
                             }
                         }
                         Text {

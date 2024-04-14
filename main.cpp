@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("laserposition-estimator");
     app.setOrganizationDomain("laserposition-estimator");
 
-    DisplayManager manager;
+    DisplayManager &manager = DisplayManager::getInstance();
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

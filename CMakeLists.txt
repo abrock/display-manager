@@ -50,6 +50,7 @@ set(COMMON_LIBS
     fmt::fmt
     libaravis-0.8.so
     glib-2.0 gio-2.0 gobject-2.0 gthread-2.0
+    ParallelTime
 )
 
 set(LIB_SOURCES
