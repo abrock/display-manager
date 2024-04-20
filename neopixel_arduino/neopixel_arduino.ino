@@ -7,12 +7,12 @@ int i=0;
 
 #define PIN 2
 #define NUM_PIXELS 13
-#define NUM_IMG 5
+#define NUM_IMG 1
 
 // Maximum mean brightness to protect a slightly undersized power supply.
 // All colors channels are allowed to have full brightness (255),
 // but not all pixels and all color channels at the same time.
-#define MAX_MEAN_BRIGHTNESS 12
+#define MAX_MEAN_BRIGHTNESS 3
 
 uint32_t const max_total_brightness = uint32_t(MAX_MEAN_BRIGHTNESS) * NUM_PIXELS * 4;
 
@@ -38,7 +38,7 @@ void setup()  {
   for (int ii = 0; ii < NUM_IMG; ++ii) {
     image_delays[ii] = 1000;
     for (int jj = 0; jj < NUM_PIXELS; ++jj) {
-      images[ii][jj] = ((jj + NUM_IMG - ii) % NUM_IMG)*(255/NUM_IMG);
+      images[ii][jj] = ((jj + NUM_IMG - ii) % (NUM_IMG+1))*(255/NUM_IMG);
     }
   }
 
@@ -133,6 +133,10 @@ void show_img_sub() {
 }
 
 void show_img() {
+  Serial.print("max-num-img: ");
+  Serial.println(NUM_IMG);
+  Serial.print("num-pixels: ");
+  Serial.println(NUM_PIXELS);
   if (num_img <= 0 || reading_img) {
     return;
   }

@@ -102,6 +102,12 @@ Window {
                         }
                     }
                 }
+                RowLayout {
+                    Button {
+                        text: "Send to uC"
+                        onClicked: displayManager.sendToUC();
+                    }
+                }
             }
         }
     }
