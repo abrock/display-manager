@@ -110,6 +110,15 @@ Window {
                 }
                 RowLayout {
                     Button {
+                        text: "Reload images from disk"
+                        onClicked: {
+                            displayManager.setImageFiles(set.image_files)
+                            displayManager.setMaskFile(set.mask_file)
+                        }
+                    }
+                }
+                RowLayout {
+                    Button {
                         text: "Color (RGBW)"
                         onClicked: displayManager.sendColorToUC();
                     }
