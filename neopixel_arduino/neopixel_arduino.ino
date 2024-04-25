@@ -199,7 +199,9 @@ void loop()  {
       image_sums[img_idx] += current_byte;
       pixel_idx++;
       if (NUM_PIXELS == pixel_idx) {
-        Serial.print("Finished receiving image, image sum is ");
+        Serial.print("Finished receiving image #");
+        Serial.print(img_idx);
+        Serial.print(", image sum is ");
         Serial.println(image_sums[img_idx]);
         pixel_idx = 0;
         reading_img = false;
