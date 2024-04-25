@@ -22,6 +22,8 @@ class DisplayManager : public QObject{
     std::vector<cv::Mat3b> images;
     size_t image_show_index = 0;
 
+    cv::Vec4b color;
+
     /**
      * @brief max_num_img is the maximum number of images the uC can store in memory. This is reported by the uC via the serial connection.
      */
@@ -31,6 +33,8 @@ class DisplayManager : public QObject{
      * @brief num_pixels is the number of pixels according to the uC program. This is reported by the uC via the serial connection.
      */
     int num_pixels = -1;
+
+    int num_frames = 1;
 
     cv::Mat1b mask;
 
@@ -53,6 +57,8 @@ class DisplayManager : public QObject{
     void image_display_thread();
 
     void show_image();
+
+    void show_pixel_routine();
 
     LS::SerialPort port;
     LS::BaudRate connection_baudrate = LS::BaudRate::BAUD_115200;
@@ -86,16 +92,26 @@ public:
 
     Q_INVOKABLE void setMaskFile(QString const& str);
 
+    Q_INVOKABLE void setColor(QString const& channel, QString const& value);
+
+    Q_INVOKABLE void setNumFrames(QString const& value);
+
     /**
      * @brief sendToUC sends a single image to the uC
      * @param img_idx
      */
-    void sendToUC(int const img_idx);
+    void sendImgToUC(int const img_idx);
+
+    Q_INVOKABLE void sendColorToUC();
+
+    Q_INVOKABLE void sendNumFramesToUC();
+
+    Q_INVOKABLE void sendEverythingToUC();
 
     /**
      * @brief sendToUC sends the image data to the uC
      */
-    Q_INVOKABLE void sendToUC();
+    Q_INVOKABLE void sendImgToUC();
 };
 
 #endif // DISPLAYMANAGER_H

@@ -6,13 +6,13 @@
 int i=0;
 
 #define PIN 2
-#define NUM_PIXELS 13
-#define NUM_IMG 1
+#define NUM_PIXELS 578
+#define NUM_IMG 2
 
 // Maximum mean brightness to protect a slightly undersized power supply.
 // All colors channels are allowed to have full brightness (255),
 // but not all pixels and all color channels at the same time.
-#define MAX_MEAN_BRIGHTNESS 3
+#define MAX_MEAN_BRIGHTNESS 200
 
 uint32_t const max_total_brightness = uint32_t(MAX_MEAN_BRIGHTNESS) * NUM_PIXELS * 4;
 
@@ -47,6 +47,11 @@ void setup()  {
 
   last_serial_input = seconds();
   last_img_switched = millis();
+
+  Serial.print("max-num-img: ");
+  Serial.println(NUM_IMG);
+  Serial.print("num-pixels: ");
+  Serial.println(NUM_PIXELS);
 }
 
 String line;
@@ -62,12 +67,15 @@ void handle_line() {
   if (0 == line.length()) {
     return;
   }
-  Serial.println("Handling command: ");
+  Serial.print("Handling command with ");
+  Serial.print(line.length());
+  Serial.print(" characters: ");
   Serial.println(line);
   if (line.startsWith("num-images: ")) {
     num_img = line.substring(String("num-images: ").length()).toInt();
     Serial.print("Set num_img to ");
     Serial.println(num_img);
+    line = "";
   }
   if (line.startsWith("set-color-channel-")) {
     if (line.length() < String("set-color-channel-").length()+4) {
@@ -126,35 +134,45 @@ void show_img_sub() {
   for (uint16_t ii = 0; ii < NUM_PIXELS; ++ii) {
     set_px_color_scaled(ii, images[display_img_idx][ii]);
   }
+  /*
   Serial.print("Max total brightness:     ");
   Serial.println(max_total_brightness);
   Serial.print("Current total brightness: ");
   Serial.println(total_brightness);
+  */
 }
 
 void show_img() {
+  /*
   Serial.print("max-num-img: ");
   Serial.println(NUM_IMG);
   Serial.print("num-pixels: ");
   Serial.println(NUM_PIXELS);
+  // */
   if (num_img <= 0 || reading_img) {
     return;
   }
   display_img_idx = (display_img_idx + 1) % num_img;
+  /*
   Serial.print("\n\nStarting show_img for image #");
   Serial.println(display_img_idx);
+  */
   global_brightness_scale = 255;
   show_img_sub();
   if (total_brightness > max_total_brightness) {
     global_brightness_scale = uint8_t((uint64_t(max_total_brightness)*uint64_t(255))/uint64_t(total_brightness));
+    /*
     Serial.print("Maximum total brightness too high, scaling by ");
     Serial.println(global_brightness_scale);
+    // */
     show_img_sub();
   }
   pixels.show();
+  /*
   Serial.print("Pixels for image #");
   Serial.print(display_img_idx);
   Serial.println(" were set and shown");
+  // */
 }
 
 void loop()  {
@@ -167,19 +185,20 @@ void loop()  {
       line = "";
       return;
     }
-    if (current_byte == '\n' || current_byte == '\r') {
-      handle_line();
-      return;
-    }
     if (reading_img) {
       images[img_idx][pixel_idx] = current_byte;
       image_sums[img_idx] += current_byte;
       pixel_idx++;
       if (NUM_PIXELS == pixel_idx) {
-        Serial.println("Finished receiving image");
+        Serial.print("Finished receiving image, image sum is ");
+        Serial.println(image_sums[img_idx]);
         pixel_idx = 0;
         reading_img = false;
       }
+      return;
+    }
+    if (current_byte == '\n' || current_byte == '\r') {
+      handle_line();
       return;
     }
     line += char(current_byte);
@@ -202,8 +221,10 @@ void loop()  {
       line = "";
       return;
     }
+    /*
     Serial.println("Current line:");
     Serial.println(line);
+    // */
   }
 
   if (num_img <= 0) {
@@ -221,6 +242,7 @@ void loop()  {
       Serial.println("Got incomplete line, timed out:");
       Serial.println(line);
       line = "";
+      last_serial_input = seconds();
     }
   }
 }

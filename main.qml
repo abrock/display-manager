@@ -38,6 +38,11 @@ Window {
                     id: set
                     property string mask_file: ""
                     property string image_files: ""
+                    property string color_r: "0"
+                    property string color_g: "0"
+                    property string color_b: "0"
+                    property string color_w: "30"
+                    property string num_frames: "2"
                 }
                 RowLayout {
                     ColumnLayout {
@@ -104,8 +109,72 @@ Window {
                 }
                 RowLayout {
                     Button {
-                        text: "Send to uC"
-                        onClicked: displayManager.sendToUC();
+                        text: "Color (RGBW)"
+                        onClicked: displayManager.sendColorToUC();
+                    }
+                    TextField {
+                        text: set.color_r
+                        id: color_r
+                        onTextChanged: {
+                            set.color_r = text;
+                            displayManager.setColor("r", text);
+                        }
+                        Component.onCompleted: displayManager.setColor("r", text);
+                    }
+                    TextField {
+                        text: set.color_g
+                        id: color_g
+                        onTextChanged: {
+                            set.color_g = text;
+                            displayManager.setColor("g", text);
+                        }
+                        Component.onCompleted: displayManager.setColor("g", text);
+                    }
+                    TextField {
+                        text: set.color_b
+                        id: color_b
+                        onTextChanged: {
+                            set.color_b = text;
+                            displayManager.setColor("b", text);
+                        }
+                        Component.onCompleted: displayManager.setColor("b", text);
+                    }
+                    TextField {
+                        text: set.color_w
+                        id: color_w
+                        onTextChanged: {
+                            set.color_w = text;
+                            displayManager.setColor("w", text);
+                        }
+                        Component.onCompleted: displayManager.setColor("w", text);
+                    }
+                }
+                RowLayout {
+                    Button {
+                        text: "#Frames"
+                        onClicked: displayManager.sendNumFramesToUC();
+                    }
+                    TextField {
+                        text: set.num_frames
+                        onTextChanged: {
+                            set.num_frames = text;
+                            displayManager.setNumFrames(text);
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Button {
+                        text: "Send images to uC"
+                        onClicked: {
+                            displayManager.sendImgToUC();
+                        }
+                    }
+                    Button {
+                        text: "Send everything to uC"
+                        onClicked: {
+                            displayManager.sendEverythingToUC();
+                        }
                     }
                 }
             }

@@ -8,6 +8,39 @@
 
 #include <ParallelTime/paralleltime.h>
 
+cv::Point bottom_left(cv::Size const& size) {
+    return {0, size.height-1};
+}
+
+cv::Point bottom_left(cv::Mat const& img) {
+    return bottom_left(img.size());
+}
+
+bool in_img(cv::Size const& size, cv::Point const& pt) {
+    return pt.x >= 0 && pt.y >= 0 && pt.x < size.width && pt.y < size.height;
+}
+
+bool in_img(cv::Mat const& img, cv::Point const& pt) {
+    return in_img(img.size(), pt);
+}
+
+bool step(cv::Mat const& img, cv::Point& current_pos, cv::Point& direction) {
+    if (!in_img(img, current_pos)) {
+        return false;
+    }
+    if (in_img(img, current_pos + direction)) {
+        current_pos += direction;
+        return true;
+    }
+    cv::Point const line_up{0,-1};
+    if (in_img(img, current_pos + line_up)) {
+        current_pos += line_up;
+        direction *= -1;
+        return true;
+    }
+    return false;
+}
+
 void DisplayManager::display_img_scaled(std::string const & window_name, cv::Mat const& img) {
     cv::Mat display;
     cv::resize(img, display, cv::Size(), 20, 20, cv::INTER_NEAREST);
@@ -24,6 +57,7 @@ void DisplayManager::image_display_thread() {
     while (true) {
         ParallelTime t;
         show_image();
+        //show_pixel_routine();
         Misc::msleep(std::max(0.2, default_delay_s));
     }
 }
@@ -36,6 +70,36 @@ void DisplayManager::show_image() {
     image_show_index++;
     display_img_scaled("image", images.at(image_show_index % images.size()));
     cv::waitKey(1);
+}
+
+void DisplayManager::show_pixel_routine() {
+    cv::Mat1b mask;
+    {
+        std::lock_guard guard(image_access);
+        mask = this->mask.clone();
+        if (mask.empty()) {
+            return;
+        }
+    }
+    int const delay = 1'000'000 / mask.size().area();
+    cv::Point current_pos = bottom_left(mask);
+    cv::Point current_direction {1,0};
+    cv::Mat3b display(mask.size(), cv::Vec3b(0,0,0));
+    for (int ii = 0; ; ++ii) {
+        display(current_pos) = cv::Vec3b(255,255,255);
+        if (mask(current_pos) < 128) {
+            display(current_pos) = cv::Vec3b(0,0,255);
+            step(mask, current_pos, current_direction);
+            continue;
+        }
+        cv::imshow("progress", display);
+        cv::waitKey(1);
+        usleep(delay);
+        if (!step(mask, current_pos, current_direction)) {
+            break;
+        }
+    }
+
 }
 
 bool DisplayManager::connect_serial(std::string const& path) {
@@ -72,11 +136,12 @@ void DisplayManager::serial_thread() {
 
 void DisplayManager::serial_send_line(const std::string &str) {
     std::lock_guard guard(serial_access);
-    port.Write(str);
+    port.Write(str + "\n");
     port.DrainWriteBuffer();
     static size_t sent_counter = 0;
     sent_counter++;
     Misc::println("Sent line #{} to uC", sent_counter);
+    Misc::msleep(.1);
 }
 
 void DisplayManager::serial_thread_sub() {
@@ -158,40 +223,34 @@ void DisplayManager::setMaskFile(const QString &str) {
     }
 }
 
-cv::Point bottom_left(cv::Size const& size) {
-    return {0, size.height-1};
-}
-
-cv::Point bottom_left(cv::Mat const& img) {
-    return bottom_left(img.size());
-}
-
-bool in_img(cv::Size const& size, cv::Point const& pt) {
-    return pt.x >= 0 && pt.y >= 0 && pt.x < size.width && pt.y < size.height;
-}
-
-bool in_img(cv::Mat const& img, cv::Point const& pt) {
-    return in_img(img.size(), pt);
-}
-
-bool step(cv::Mat const& img, cv::Point& current_pos, cv::Point& direction) {
-    if (!in_img(img, current_pos)) {
-        return false;
+void DisplayManager::setColor(
+        const QString &channel,
+        const QString &value) {
+    if (channel.length() < 1) {
+        return;
     }
-    if (in_img(img, current_pos + direction)) {
-        current_pos += direction;
-        return true;
+    switch(channel.toStdString()[0]) {
+    case 'r':
+        color[0] = cv::saturate_cast<uint8_t>(value.toInt());
+        break;
+    case 'g':
+        color[1] = cv::saturate_cast<uint8_t>(value.toInt());
+        break;
+    case 'b':
+        color[2] = cv::saturate_cast<uint8_t>(value.toInt());
+        break;
+    case 'w':
+        color[3] = cv::saturate_cast<uint8_t>(value.toInt());
+        break;
     }
-    cv::Point const line_up{0,-1};
-    if (in_img(img, current_pos + line_up)) {
-        current_pos += line_up;
-        direction *= -1;
-        return true;
-    }
-    return false;
+    std::cout << "Color: " << color << std::endl;
 }
 
-void DisplayManager::sendToUC(const int img_idx) {
+void DisplayManager::setNumFrames(const QString &value) {
+    num_frames = value.toInt();
+}
+
+void DisplayManager::sendImgToUC(const int img_idx) {
     if (img_idx >= max_num_img || img_idx >= images.size()) {
         return;
     }
@@ -204,21 +263,47 @@ void DisplayManager::sendToUC(const int img_idx) {
 
     cv::Point current_pos = bottom_left(img);
     cv::Point current_direction {1,0};
-    for (int ii = 0; ii < num_pixels; ++ii) {
+    std::string img_data;
+    for (int ii = 0; img_data.size() < num_pixels; ++ii) {
         if (mask(current_pos) < 128) {
             step(img, current_pos, current_direction);
             continue;
         }
-        msg += char(img(current_pos)[1]);
+        img_data += char(img(current_pos)[1]);
         if (!step(img, current_pos, current_direction)) {
             break;
         }
     }
-    serial_send_line(msg);
+    if (img_data.size() != num_pixels) {
+        Misc::println("Image provided {} pixels which doesn't match the expected {}.",
+                      img_data.size(), num_pixels);
+    }
+    if (img_data.size() < num_pixels) {
+        img_data += std::string(num_pixels - img_data.size(), char(0));
+    }
+    msg += img_data;
+    serial_send_line("\n" + msg);
 }
 
-void DisplayManager::sendToUC() {
+void DisplayManager::sendColorToUC() {
+    serial_send_line("set-color-channel-r: " + std::to_string(color[0]));
+    serial_send_line("set-color-channel-g: " + std::to_string(color[1]));
+    serial_send_line("set-color-channel-b: " + std::to_string(color[2]));
+    serial_send_line("set-color-channel-w: " + std::to_string(color[3]));
+}
+
+void DisplayManager::sendNumFramesToUC() {
+    serial_send_line("num-images: " + std::to_string(num_frames));
+}
+
+void DisplayManager::sendEverythingToUC() {
+    sendColorToUC();
+    sendNumFramesToUC();
+    sendImgToUC();
+}
+
+void DisplayManager::sendImgToUC() {
     for (int img_idx = 0; img_idx < images.size() && img_idx < max_num_img; ++img_idx) {
-        sendToUC(img_idx);
+        sendImgToUC(img_idx);
     }
 }
