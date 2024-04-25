@@ -77,6 +77,15 @@ void handle_line() {
     Serial.println(num_img);
     line = "";
   }
+  if (line.startsWith("delay: ")) {
+    int const delay = line.substring(String("delay: ").length()).toInt();
+    for (int ii = 0; ii < NUM_IMG; ++ii) {
+      image_delays[ii] = delay;
+    }
+    Serial.print("Set delay to ");
+    Serial.println(delay);
+    line = "";
+  }
   if (line.startsWith("set-color-channel-")) {
     if (line.length() < String("set-color-channel-").length()+4) {
       Serial.println("Invalid attempt at setting color:");

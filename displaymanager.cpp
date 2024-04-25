@@ -141,7 +141,7 @@ void DisplayManager::serial_send_line(const std::string &str) {
     static size_t sent_counter = 0;
     sent_counter++;
     Misc::println("Sent line #{} to uC", sent_counter);
-    Misc::msleep(.1);
+    Misc::msleep(.5);
 }
 
 void DisplayManager::serial_thread_sub() {
@@ -250,6 +250,10 @@ void DisplayManager::setNumFrames(const QString &value) {
     num_frames = value.toInt();
 }
 
+void DisplayManager::setDelay(const QString &value) {
+    delay = value.toInt();
+}
+
 void DisplayManager::sendImgToUC(const int img_idx) {
     if (img_idx >= max_num_img || img_idx >= images.size()) {
         return;
@@ -300,6 +304,10 @@ void DisplayManager::sendEverythingToUC() {
     sendColorToUC();
     sendNumFramesToUC();
     sendImgToUC();
+}
+
+void DisplayManager::sendDelayToUC() {
+    serial_send_line("delay: " + std::to_string(delay));
 }
 
 void DisplayManager::sendImgToUC() {

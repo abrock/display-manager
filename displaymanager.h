@@ -52,6 +52,8 @@ class DisplayManager : public QObject{
      */
     double default_delay_s = 0.5;
 
+    int delay = 1000;
+
     DisplayManager();
 
     void image_display_thread();
@@ -96,6 +98,8 @@ public:
 
     Q_INVOKABLE void setNumFrames(QString const& value);
 
+    Q_INVOKABLE void setDelay(QString const& value);
+
     /**
      * @brief sendToUC sends a single image to the uC
      * @param img_idx
@@ -107,6 +111,8 @@ public:
     Q_INVOKABLE void sendNumFramesToUC();
 
     Q_INVOKABLE void sendEverythingToUC();
+
+    Q_INVOKABLE void sendDelayToUC();
 
     /**
      * @brief sendToUC sends the image data to the uC

@@ -43,6 +43,7 @@ Window {
                     property string color_b: "0"
                     property string color_w: "30"
                     property string num_frames: "2"
+                    property string delay: "1000"
                 }
                 RowLayout {
                     ColumnLayout {
@@ -162,7 +163,19 @@ Window {
                         }
                     }
                 }
-
+                RowLayout {
+                    Button {
+                        text: "Delay [ms]"
+                        onClicked: displayManager.sendDelayToUC();
+                    }
+                    TextField {
+                        text: set.delay
+                        onTextChanged: {
+                            set.delay = text;
+                            displayManager.setDelay(text);
+                        }
+                    }
+                }
                 RowLayout {
                     Button {
                         text: "Send images to uC"
