@@ -7,7 +7,7 @@ int i=0;
 
 #define PIN 2
 #define NUM_PIXELS 578
-#define NUM_IMG 2
+#define NUM_IMG 5
 
 // Maximum mean brightness to protect a slightly undersized power supply.
 // All colors channels are allowed to have full brightness (255),
