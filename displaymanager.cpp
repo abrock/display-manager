@@ -268,16 +268,22 @@ void DisplayManager::sendImgToUC(const int img_idx) {
     cv::Point current_pos = bottom_left(img);
     cv::Point current_direction {1,0};
     std::string img_data;
+    std::string code;
     for (int ii = 0; img_data.size() < num_pixels; ++ii) {
         if (mask(current_pos) < 128) {
             step(img, current_pos, current_direction);
             continue;
         }
         img_data += char(img(current_pos)[1]);
+        if (!code.empty()) {
+            code += ",";
+        }
+        code += std::to_string(int(img(current_pos)[1]));
         if (!step(img, current_pos, current_direction)) {
             break;
         }
     }
+    Misc::println("uint8_t image[{}] = {};", num_pixels, "{" + code + "}");
     if (img_data.size() != num_pixels) {
         Misc::println("Image provided {} pixels which doesn't match the expected {}.",
                       img_data.size(), num_pixels);
