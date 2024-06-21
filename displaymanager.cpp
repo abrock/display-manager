@@ -269,6 +269,7 @@ void DisplayManager::sendImgToUC(const int img_idx) {
     cv::Point current_direction {1,0};
     std::string img_data;
     std::string code;
+    std::string code_rgbw;
     for (int ii = 0; img_data.size() < num_pixels; ++ii) {
         if (mask(current_pos) < 128) {
             step(img, current_pos, current_direction);
@@ -279,11 +280,19 @@ void DisplayManager::sendImgToUC(const int img_idx) {
             code += ",";
         }
         code += std::to_string(int(img(current_pos)[1]));
+        cv::Vec4b color_rgbw = Misc::rgb2rgbw(img(current_pos), rgb_factors);
+        for (size_t cc = 0; cc < 4; ++cc) {
+            if (!code_rgbw.empty()) {
+                code_rgbw += ",";
+            }
+            code_rgbw += std::to_string(int(color_rgbw[cc]));
+        }
         if (!step(img, current_pos, current_direction)) {
             break;
         }
     }
     Misc::println("uint8_t image[{}] = {};", num_pixels, "{" + code + "}");
+    Misc::println("uint8_t image[{}] = {};", 4*num_pixels, "{" + code_rgbw + "}");
     if (img_data.size() != num_pixels) {
         Misc::println("Image provided {} pixels which doesn't match the expected {}.",
                       img_data.size(), num_pixels);

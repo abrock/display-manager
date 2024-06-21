@@ -1,6 +1,28 @@
 #include "misc.h"
 
+#include <opencv2/core.hpp>
+
+#include <glog/logging.h>
+
 namespace Misc {
+
+cv::Vec4d rgb2rgbw(const cv::Vec3d &rgb, cv::Vec3d const& factors) {
+    double max_white_value = 255;
+    for (size_t ii = 0; ii < 3; ++ii) {
+        max_white_value = std::min(max_white_value, rgb[ii] / factors[ii]);
+    }
+    CHECK_GE(max_white_value, 0);
+    CHECK_LE(max_white_value, 255);
+    cv::Vec4d result(0, 0, 0, max_white_value);
+    for (size_t ii = 0; ii < 3; ++ii) {
+        double const already_explained = max_white_value * factors[ii];
+        double const missing = rgb[ii] - already_explained;
+        CHECK_GE(missing, 0);
+        CHECK_LE(missing, 255);
+        result[ii] = missing;
+    }
+    return result;
+}
 
 std::string prune_fn(const std::string &fn) {
     return trim(strip_prefix(trim(fn), "file://"));
@@ -54,6 +76,10 @@ std::vector<std::string> split_fns(const std::string &in) {
 
 void msleep(const double t) {
     usleep(1'000'000 * t);
+}
+
+cv::Vec4b rgb2rgbw(const cv::Vec3b &rgb, const cv::Vec3d &factors) {
+    return rgb2rgbw(cv::Vec3d(rgb), factors);
 }
 
 }

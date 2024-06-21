@@ -79,6 +79,12 @@ class DisplayManager : public QObject{
 
     void handle_serial_line(std::string const& line);
 
+    /**
+     * @brief rgb_factors contains the factors telling the function Misc::rgb2rgbw
+     * how much color-intensity the white LED provides for each color-channel.
+     */
+    cv::Vec3d rgb_factors{1,1,1};
+
 public:
     DisplayManager(DisplayManager const&)               = delete;
     void operator=(DisplayManager const&)  = delete;
