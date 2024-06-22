@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="270mm"
+   height="220mm"
+   viewBox="0 0 1020.4725 831.49611"
+   fill="none"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="garlic-portrait3.svg"
+   inkscape:version="1.4-dev (3115e27fb3, 2024-03-16, custom)"
+   inkscape:export-filename="garlic-portrait2.png"
+   inkscape:export-xdpi="2.54"
+   inkscape:export-ydpi="2.54"
+   xml:space="preserve"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview8"
+     pagecolor="#000000"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.50760802"
+     inkscape:cx="592.97723"
+     inkscape:cy="766.33935"
+     inkscape:window-width="1916"
+     inkscape:window-height="1161"
+     inkscape:window-x="0"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:export-bgcolor="#000000ff"
+     showguides="true"
+     inkscape:rotation="90"><sodipodi:guide
+       position="320.39402,-423.61261"
+       orientation="0,-1"
+       id="guide3"
+       inkscape:locked="false" /></sodipodi:namedview><style
+     id="style5">
+.measure-arrow
+{
+}
+.measure-label
+{
+
+}
+.measure-line
+{
+}</style><defs
+     id="defs8" /><g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="mask"
+     transform="translate(-68.5999,36.9383)"
+     style="display:inline"><image
+       width="1020.4725"
+       height="831.49603"
+       preserveAspectRatio="none"
+       style="image-rendering:optimizeSpeed"
+       xlink:href="mask-inverted.png"
+       id="image1-6"
+       x="68.599899"
+       y="-36.938206" /></g><g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="garlic"><path
+       style="fill:none;stroke:#ffffff;stroke-width:75.59055795;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none"
+       d="m 214.18322,443.55397 c 54.78319,5.80128 244.33113,175.34449 432.57153,169.9515 163.40963,-4.6816 237.07,-131.76744 219.74919,-234.47826 -17.33529,-102.79671 -146.20611,-171.89424 -286.45799,-159.813 -111.74823,9.62594 -173.60894,71.3049 -241.43475,130.86915 -89.9589,79.00139 -168.76204,72.2833 -195.70028,89.94101 18.75933,1.02799 16.48912,-2.27167 71.2723,3.5296 z"
+       id="path1"
+       sodipodi:nodetypes="zsssscz" /><path
+       style="fill:none;stroke:#ffffff;stroke-width:68.03150215;stroke-miterlimit:1;stroke-dasharray:none"
+       d="m 316.40154,493.85029 c 47.14965,55.72676 108.05062,168.23308 178.70263,225.31843 102.26937,82.63151 238.64855,81.75427 329.44257,25.53823 108.2078,-66.99798 54.9624,-191.38105 -9.22511,-223.29802"
+       id="path2"
+       sodipodi:nodetypes="cssc" /><path
+       style="fill:none;stroke:#ffffff;stroke-width:68.03150215;stroke-miterlimit:1;stroke-dasharray:none"
+       d="M 320.19565,356.62211 C 400.99474,182.99031 576.46652,-26.292135 794.76853,72.392909 881.46756,111.58585 881.84157,207.24848 835.9106,287.38925"
+       id="path3"
+       sodipodi:nodetypes="csc" /><path
+       id="path4"
+       style="fill:#00ff00;stroke-width:94.4882;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1"
+       d="M 306.33876,425.52521 C 305.70185,484.2577 236.81869,516.66012 157.54218,497.32184 103.02894,484.02417 0.03924358,425.52521 0.03924358,425.52521 c 0,0 107.97449642,-54.17567 158.54769642,-67.96584 78.72677,-21.46701 148.38873,9.23335 147.75182,67.96584 z"
+       sodipodi:nodetypes="zscsz" /></g></svg>
