@@ -27,7 +27,7 @@ class DisplayManager : public QObject{
     /**
      * @brief max_num_img is the maximum number of images the uC can store in memory. This is reported by the uC via the serial connection.
      */
-    int max_num_img = -1;
+    int max_num_img = 1;
 
     /**
      * @brief num_pixels is the number of pixels according to the uC program. This is reported by the uC via the serial connection.

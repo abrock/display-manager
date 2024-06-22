@@ -109,7 +109,10 @@ bool DisplayManager::connect_serial(std::string const& path) {
         port.SetBaudRate(connection_baudrate);
     }
     catch(...) {
-        port.Close();
+        try {
+            port.Close();
+        }
+        catch(...) {}
         return false;
     }
     return port.IsOpen();
@@ -136,12 +139,17 @@ void DisplayManager::serial_thread() {
 
 void DisplayManager::serial_send_line(const std::string &str) {
     std::lock_guard guard(serial_access);
-    port.Write(str + "\n");
-    port.DrainWriteBuffer();
-    static size_t sent_counter = 0;
-    sent_counter++;
-    Misc::println("Sent line #{} to uC", sent_counter);
-    Misc::msleep(.5);
+    try {
+        port.Write(str + "\n");
+        port.DrainWriteBuffer();
+        static size_t sent_counter = 0;
+        sent_counter++;
+        Misc::println("Sent line #{} to uC", sent_counter);
+        Misc::msleep(.5);
+    }
+    catch (std::exception const& e) {
+        Misc::println("Writing to the serial port failed with exception:\n{}", e.what());
+    }
 }
 
 void DisplayManager::serial_thread_sub() {
@@ -261,7 +269,10 @@ void DisplayManager::sendImgToUC(const int img_idx) {
     std::string msg = "Set image #" + std::to_string(img_idx);
 
     cv::Mat3b const& img = images[img_idx];
-    if (mask.size != img.size) {
+    if (mask.size() != img.size()) {
+        Misc::println("Mask ({}, {}) and image ({}, {}) size don't match",
+                      mask.size().width, mask.size().height,
+                      img.size().width, img.size().height);
         return;
     }
 
